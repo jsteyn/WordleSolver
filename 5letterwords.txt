@@ -1414,6 +1414,7 @@ drink
 drips
 drive
 droid
+droit
 droll
 drone
 drool
