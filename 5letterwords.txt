@@ -2622,6 +2622,7 @@ khans
 kicks
 kicky
 kiddo
+kidge
 kikes
 kills
 kilns
@@ -3076,6 +3077,7 @@ micas
 micks
 micro
 middy
+midge
 midis
 midst
 miens
