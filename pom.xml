@@ -38,7 +38,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.example.FindLengthFive</mainClass>
+                            <mainClass>org.example.WordleSolver</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
