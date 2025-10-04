@@ -27,8 +27,8 @@ public class FindLengthFive extends JFrame {
         System.out.println("Find Length Five");
         setTitle("Find Length Five");
         KeyStroke ctrlS = KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK);
-        KeyStroke ctrlC = KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK);
-        KeyStroke ctrlD = KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_DOWN_MASK);
+        KeyStroke ctrlX = KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_DOWN_MASK);
+
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 768);
@@ -62,7 +62,7 @@ public class FindLengthFive extends JFrame {
         // Bind it at the window level so it's always active
         JRootPane rootPane = this.getRootPane();
 
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(ctrlD, "triggerClear");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(ctrlX, "triggerClear");
         rootPane.getActionMap().put("triggerClear", clearAction);
 
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(ctrlS, "triggerSearch");
