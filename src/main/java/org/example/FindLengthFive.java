@@ -7,11 +7,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class FindLengthFive extends JFrame {
-    private static JPanel panel = new JPanel();
+    private static JPanel leftPanel = new JPanel();
+    private static JPanel rightPanel = new JPanel();
+    private static JPanel topPanel = new JPanel();
+    private static JPanel bottomPanel = new JPanel();
 
     private static final JLabel lbl_excludes = new JLabel("Not included");
     private static final JLabel lbl_positions = new JLabel("Known positions");
@@ -22,6 +27,9 @@ public class FindLengthFive extends JFrame {
     private static final JButton search = new JButton("Search");
     private static final JButton clear = new JButton("Clear");
     private static final JTextArea ta_words = new JTextArea();
+    private static final JTextField tf_newwords = new JTextField();
+    private static final JButton add = new JButton("Add");
+    private static final File wordFile = new File("5letterwords.txt");
 
     public FindLengthFive() {
         System.out.println("Find Length Five");
@@ -32,33 +40,49 @@ public class FindLengthFive extends JFrame {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 768);
-        getContentPane().add(panel);
-        panel.setLayout(new MigLayout("", "[20%][80%]", "[fill][fill]"));
+        getContentPane().add(leftPanel);
 
-        panel.add(lbl_excludes, "cell 0 3,alignx trailing");
-        panel.add(tf_excludes, "cell 1 3,growx");
-        panel.add(lbl_positions, "cell 0 4,alignx trailing");
+        setLayout(new MigLayout("", "", ""));
+        leftPanel.setLayout(new MigLayout("", "", "[fill][fill]"));
+        rightPanel.setLayout(new MigLayout("", "[fill]"));
+        topPanel.setLayout(new MigLayout("", "[fill]"));
+        bottomPanel.setLayout(new MigLayout("", "[fill]"));
+
+        leftPanel.add(lbl_excludes, "cell 0 3,alignx trailing");
+        leftPanel.add(tf_excludes, "cell 1 3,growx");
+        leftPanel.add(lbl_positions, "cell 0 4,alignx trailing");
         for (int i = 0; i < tf_positions.length; i++) {
             tf_positions[i] = new JTextField(' ');
-            panel.add(tf_positions[i], "cell 1 4,growx");
+            leftPanel.add(tf_positions[i], "cell 1 4,growx");
         }
-        panel.add(lbl_knownexcludes, "cell 0 5,alignx trailing");
+        leftPanel.add(lbl_knownexcludes, "cell 0 5,alignx trailing");
         for (int i = 0; i < tf_knownexcludes.length; i++) {
             tf_knownexcludes[i] = new JTextField(' ');
-            panel.add(tf_knownexcludes[i], "cell 1 5,growx");
+            leftPanel.add(tf_knownexcludes[i], "cell 1 5,growx");
         }
-        panel.add(new JLabel(), "wrap");
-        panel.add(search);
-        panel.add(clear, "wrap");
+
+
         search.addActionListener(searchAction);
         clear.addActionListener(clearAction);
+        add.addActionListener(addWord);
 
 // ✅ Put the JTextArea inside a JScrollPane
         JScrollPane scroll = new JScrollPane(ta_words);
 
 // ✅ Span across 2 columns, grow horizontally AND vertically
-        panel.add(scroll, "span, grow, push");
 
+        leftPanel.add(new JLabel(), "wrap");
+        leftPanel.add(search);
+        leftPanel.add(clear, "wrap");
+
+        rightPanel.add(tf_newwords, "wrap");
+        rightPanel.add(add, "wrap");
+
+        topPanel.add(leftPanel, "cell 0 0,grow");
+        topPanel.add(rightPanel, "cell 1 0,grow");
+        bottomPanel.add(scroll, "span, grow, push");
+        add(topPanel, "wrap");
+        add(bottomPanel, "span, grow, push");
         // Bind it at the window level so it's always active
         JRootPane rootPane = this.getRootPane();
 
@@ -105,6 +129,22 @@ public class FindLengthFive extends JFrame {
         }
     };
 
+    Action addWord = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                PrintWriter pw = new PrintWriter(new FileOutputStream(
+                        wordFile,
+                        true /* append = true */));
+                pw.println(tf_newwords.getText());
+                SortContentsByLinesInFile.sortFile(wordFile.getName());
+                pw.close();
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    };
+
     private void doClear() {
         ta_words.setText("");
         tf_excludes.setText("");
@@ -138,7 +178,7 @@ public class FindLengthFive extends JFrame {
         System.out.println(Arrays.toString(posexludes));
         try {
             System.out.println("Open file");
-            Scanner sc = new Scanner(new File("5letterwords.txt"));
+            Scanner sc = new Scanner(wordFile);
             int lines = 0;
             while (sc.hasNextLine()) {
                 String word = sc.nextLine();

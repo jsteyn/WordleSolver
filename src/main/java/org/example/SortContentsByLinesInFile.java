@@ -13,8 +13,12 @@ import java.util.List;
 public class SortContentsByLinesInFile {
 
     public static void main(String[] args) {
+        sortFile("5letterwords.txt");
+    }
 
-        String fileName ="5letterwords.txt";
+    public static void sortFile(String filename) {
+
+        String fileName = filename;
 
 
         try {
