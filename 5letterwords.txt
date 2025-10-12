@@ -3762,6 +3762,7 @@ poufs
 pound
 pours
 pouts
+pouty
 power
 poxed
 poxes
@@ -5344,6 +5345,7 @@ usurp
 usury
 uteri
 utero
+utile
 utter
 uvula
 vacua

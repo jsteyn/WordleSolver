@@ -10,7 +10,7 @@ import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class WordleSolver extends JFrame {
+public class FindLengthFive extends JFrame {
     private static JPanel panel = new JPanel();
 
     private static final JLabel lbl_excludes = new JLabel("Not included");
@@ -23,7 +23,7 @@ public class WordleSolver extends JFrame {
     private static final JButton clear = new JButton("Clear");
     private static final JTextArea ta_words = new JTextArea();
 
-    public WordleSolver() {
+    public FindLengthFive() {
         System.out.println("Find Length Five");
         setTitle("Find Length Five");
         KeyStroke ctrlS = KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK);
@@ -72,7 +72,7 @@ public class WordleSolver extends JFrame {
     }
 
     public static void main(String[] args) {
-        WordleSolver wordleSolver = new WordleSolver();
+        FindLengthFive findLengthFive = new FindLengthFive();
     }
 
     private static boolean excludesAny(String word, String excludes) {
