@@ -4,6 +4,7 @@ import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,7 +13,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class FindLengthFive extends JFrame {
+public class FindLengthFive extends JFrame implements ActionListener {
     private static JPanel leftPanel = new JPanel();
     private static JPanel rightPanel = new JPanel();
     private static JPanel topPanel = new JPanel();
@@ -32,10 +33,10 @@ public class FindLengthFive extends JFrame {
     private static final File wordFile = new File("5letterwords.txt");
 
     public FindLengthFive() {
-        System.out.println("Find Length Five");
         setTitle("Find Length Five");
+        KeyStroke ctrlD = KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_DOWN_MASK);
         KeyStroke ctrlS = KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK);
-        KeyStroke ctrlX = KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_DOWN_MASK);
+        KeyStroke ctrlB = KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK);
 
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -62,9 +63,9 @@ public class FindLengthFive extends JFrame {
         }
 
 
-        search.addActionListener(searchAction);
-        clear.addActionListener(clearAction);
-        add.addActionListener(addWord);
+        search.addActionListener(this);
+        clear.addActionListener(this);
+        add.addActionListener(this);
 
 // ✅ Put the JTextArea inside a JScrollPane
         JScrollPane scroll = new JScrollPane(ta_words);
@@ -83,21 +84,23 @@ public class FindLengthFive extends JFrame {
         bottomPanel.add(scroll, "span, grow, push");
         add(topPanel, "wrap");
         add(bottomPanel, "span, grow, push");
-        // Bind it at the window level so it's always active
-        JRootPane rootPane = this.getRootPane();
 
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(ctrlX, "triggerClear");
-        rootPane.getActionMap().put("triggerClear", clearAction);
+        // Get the root pane input map (when the window is focused)
+        InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = getRootPane().getActionMap();
 
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(ctrlS, "triggerSearch");
-        rootPane.getActionMap().put("triggerSearch", searchAction);
+        inputMap.put(ctrlD, "triggerClear");
+        actionMap.put("triggerClear", clearAction);
+
+        inputMap.put(ctrlS, "triggerSearch");
+        actionMap.put("triggerSearch", searchAction);
+
+        inputMap.put(ctrlB, "cursorBegin");
+        actionMap.put("cursorBegin", focusExcludes);
 
         setVisible(true);
     }
 
-    public static void main(String[] args) {
-        FindLengthFive findLengthFive = new FindLengthFive();
-    }
 
     private static boolean excludesAny(String word, String excludes) {
         for (char ch : excludes.toCharArray()) {
@@ -116,7 +119,7 @@ public class FindLengthFive extends JFrame {
     Action searchAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Search button triggered!");
+            System.out.println("Search: " + e.getActionCommand());
             doSearch();
         }
     };
@@ -124,26 +127,35 @@ public class FindLengthFive extends JFrame {
     Action clearAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Clear button triggered!");
+            System.out.println("Clear: " + e.getActionCommand());
             doClear();
         }
     };
 
-    Action addWord = new AbstractAction() {
+    Action focusExcludes = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
+            tf_excludes.requestFocusInWindow();
+            tf_excludes.setCaretPosition(tf_excludes.getText().length()); // place cursor at end
+            System.out.println("Focus moved to tf_excludes");
+        }
+    };
+    private void doAdd() {
+        if (!tf_newwords.getText().isEmpty()) {
             try {
+
                 PrintWriter pw = new PrintWriter(new FileOutputStream(
                         wordFile,
                         true /* append = true */));
                 pw.println(tf_newwords.getText());
                 SortContentsByLinesInFile.sortFile(wordFile.getName());
                 pw.close();
+
             } catch (FileNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
-        }
-    };
+        } else System.out.println("Add field empty");
+    }
 
     private void doClear() {
         ta_words.setText("");
@@ -155,7 +167,7 @@ public class FindLengthFive extends JFrame {
     }
 
     private void doSearch() {
-        String includes = "";
+        StringBuilder includes = new StringBuilder();
         String excludes = "";
         String[] posexludes = {" ", " ", " ", " ", " "};
         char[] letters = {' ', ' ', ' ', ' ', ' '};
@@ -167,15 +179,12 @@ public class FindLengthFive extends JFrame {
             }
             if (!tf_knownexcludes[i].getText().isEmpty()) {
                 posexludes[i] = tf_knownexcludes[i].getText();
-                if (!includes.contains(posexludes[i])) {
-                    includes += posexludes[i];
+                if (!includes.toString().contains(posexludes[i])) {
+                    includes.append(posexludes[i]);
                 }
             }
         }
-        System.out.println(includes);
-        System.out.println(excludes);
-        System.out.println(letters);
-        System.out.println(Arrays.toString(posexludes));
+
         try {
             System.out.println("Open file");
             Scanner sc = new Scanner(wordFile);
@@ -188,6 +197,7 @@ public class FindLengthFive extends JFrame {
                     for (int i = 0; i < word.length(); i++) {
                         if (letters[i] != ' ' && letters[i] != word.charAt(i)) {
                             cont = false;
+                            break;
                         }
                     }
                     // check for letters that should be excluded in certain position
@@ -195,12 +205,13 @@ public class FindLengthFive extends JFrame {
                         for (char ch : posexludes[pos].toCharArray()) {
                             if (word.charAt(pos) == ch) {
                                 cont = false;
+                                break;
                             }
                         }
                     }
                     if (cont) {
                         // Check that word excludes the excluded letters and includes the included letters
-                        if (excludesAny(word, excludes) && (includesAll(word, includes))) {
+                        if (excludesAny(word, excludes) && (includesAll(word, includes.toString()))) {
                             lines++;
                             ta_words.append(word + "\t");
                             if (lines % 5 == 0)
@@ -214,5 +225,25 @@ public class FindLengthFive extends JFrame {
         } catch (FileNotFoundException f) {
             throw new RuntimeException(f);
         }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        System.out.println("Action: " + e.getActionCommand());
+        switch (e.getActionCommand()) {
+            case "Search": {
+                doSearch();
+                break;
+            }
+            case "Clear": {
+                doClear();
+                break;
+            }
+            case "Add": {
+                doAdd();
+                break;
+            }
+        }
+
     }
 }
