@@ -33,7 +33,7 @@ public class FindLengthFive extends JFrame implements ActionListener {
     private static final File wordFile = new File("5letterwords.txt");
 
     public FindLengthFive() {
-        setTitle("Find Length Five");
+        setTitle("Wordle Solver");
         KeyStroke ctrlD = KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_DOWN_MASK);
         KeyStroke ctrlS = KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK);
         KeyStroke ctrlB = KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK);
