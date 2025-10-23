@@ -3,9 +3,10 @@ package org.example;
 import net.miginfocom.swing.MigLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -24,12 +25,10 @@ public class FindLengthFive extends JFrame implements ActionListener {
     private static int wordlength = 5;
 
     private static final JLabel lbl_wordLength = new JLabel("Word length");
-    private static final JLabel lbl_wordFile = new JLabel("Word file");
     private static final JLabel lbl_excludes = new JLabel("Not included");
     private static final JLabel lbl_positions = new JLabel("Known positions");
     private static final JLabel lbl_knownexcludes = new JLabel("Known exclude positions");
     private static final JTextField tf_wordlength = new JTextField("5");
-    private static final JTextField tf_wordfile = new JTextField("5letterwords.txt");
     private static final JTextField tf_excludes = new JTextField();
     private static JTextField[] tf_positions;
     private static JTextField[] tf_knownexcludes;
@@ -46,8 +45,6 @@ public class FindLengthFive extends JFrame implements ActionListener {
         leftPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         leftPanel.add(lbl_wordLength, "");
         leftPanel.add(tf_wordlength, "");
-        leftPanel.add(lbl_wordFile, "");
-        leftPanel.add(tf_wordfile, "span 3");
         leftPanel.add(btn_update, "wrap");
         leftPanel.add(lbl_excludes, "");
         leftPanel.add(tf_excludes, "grow, wrap");
@@ -79,6 +76,14 @@ public class FindLengthFive extends JFrame implements ActionListener {
         setSize(640, 800);
 
         setLayout(new MigLayout("", "[fill]", ""));
+        JMenuBar mb = new JMenuBar();
+        JMenu file = new JMenu("File");
+        JMenuItem open = new JMenuItem("Open");
+        open.addActionListener(this);
+        mb.add(file);
+        file.add(open);
+        setJMenuBar(mb);
+
         makeLeftPanel(wordlength);
         getContentPane().add(leftPanel);
         rightPanel.setLayout(new MigLayout("", "[fill]"));
@@ -199,7 +204,7 @@ public class FindLengthFive extends JFrame implements ActionListener {
             letters[i] = ' ';
         }
         ta_words.setText("");
-        wordFile = new File(tf_wordfile.getText());
+        //wordFile = new File(tf_wordfile.getText());
         wordlength = Integer.valueOf(tf_wordlength.getText());
         excludes = tf_excludes.getText();
         for (int i = 0; i < tf_positions.length; i++) {
@@ -280,6 +285,16 @@ public class FindLengthFive extends JFrame implements ActionListener {
                 leftPanel.removeAll();
                 makeLeftPanel(wordlength);
                 SwingUtilities.updateComponentTreeUI(leftPanel);
+            }
+            case "Open": {
+                JFileChooser fc = new JFileChooser();
+                fc.setCurrentDirectory(new File("."));
+                FileNameExtensionFilter extFilter = new FileNameExtensionFilter("Text file", "txt", "TXT");
+                fc.addChoosableFileFilter(extFilter);
+                int result = fc.showOpenDialog(null);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    wordFile = fc.getSelectedFile();
+                }
             }
         }
 
