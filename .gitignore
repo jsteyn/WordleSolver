@@ -1,3 +1,7 @@
+a_words.txt
+afrikaans_a.txt
+vyfletters.txt
+
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
