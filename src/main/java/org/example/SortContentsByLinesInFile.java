@@ -12,25 +12,26 @@ import java.util.List;
 
 public class SortContentsByLinesInFile {
 
+    static int wl = 5;
+    static String fn = "5letterwoorde.txt";
+
     public static void main(String[] args) {
-        sortFile("5letterwords.txt");
+        sortFile(fn, wl);
     }
 
-    public static void sortFile(String filename) {
-
-        String fileName = filename;
-
+    public static void sortFile(String filename, int wordlength) {
 
         try {
             //1) Read file in String, and store each String in ArrayList
-            FileReader fr = new FileReader(fileName);
+            FileReader fr = new FileReader(filename);
             BufferedReader br = new BufferedReader(fr);
 
-            List<String> l=new ArrayList<String>();
+            List<String> wordlist=new ArrayList<String>();
             String str;
 
             while((str = br.readLine()) != null){
-                l.add(str);
+                if (str.length()==wordlength && !str.contains("."))
+                    wordlist.add(str);
             }
             br.close();
 
@@ -38,16 +39,16 @@ public class SortContentsByLinesInFile {
 
 
             //2) Sort ArrayList
-            Collections.sort(l);
+            Collections.sort(wordlist);
 
             System.out.print("Display sorted list > ");
             //Display sorted list
-            System.out.println(l);
+            System.out.println(wordlist);
 
             //3) Now, write sorted content in file
-            FileWriter fw = new FileWriter(fileName);
+            FileWriter fw = new FileWriter(filename);
             BufferedWriter bw = new BufferedWriter(fw);
-            for(String s: l){
+            for(String s: wordlist){
                 bw.write(s);
                 bw.write("\n");
             }
@@ -66,10 +67,3 @@ public class SortContentsByLinesInFile {
     }
 
 }
-/*OUTPUT
- 
-Display sorted list > [io from , javaMadeSoEasy a, learning file , you are ]
- 
-Sorted content has been written in file
- 
-*/

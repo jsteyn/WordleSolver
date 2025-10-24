@@ -175,7 +175,7 @@ public class FindLengthFive extends JFrame implements ActionListener {
                         wordFile,
                         true /* append = true */));
                 pw.println(tf_newwords.getText());
-                SortContentsByLinesInFile.sortFile(wordFile.getName());
+                SortContentsByLinesInFile.sortFile(wordFile.getName(), wordlength);
                 pw.close();
 
             } catch (FileNotFoundException ex) {
