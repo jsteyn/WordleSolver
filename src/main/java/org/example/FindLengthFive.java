@@ -175,8 +175,8 @@ public class FindLengthFive extends JFrame implements ActionListener {
                         wordFile,
                         true /* append = true */));
                 pw.println(tf_newwords.getText());
-                SortContentsByLinesInFile.sortFile(wordFile.getName(), wordlength);
                 pw.close();
+                SortContentsByLinesInFile.sortFile(wordFile.getName(), wordlength);
 
             } catch (FileNotFoundException ex) {
                 throw new RuntimeException(ex);
@@ -220,15 +220,12 @@ public class FindLengthFive extends JFrame implements ActionListener {
         }
 
         try {
-            System.out.println("Open file: " + wordFile);
             Scanner sc = new Scanner(wordFile);
             int lines = 0;
             while (sc.hasNextLine()) {
                 String word = sc.nextLine();
                 boolean cont = true;
                 // Check that word is 'wordlength' characters long
-                logger.info("Word length: {}", wordlength);
-                logger.info(word.length() + " " + word);
                 if (word.length() == wordlength) {
                     for (int i = 0; i < word.length(); i++) {
                         if (letters[i] != ' ' && letters[i] != word.charAt(i)) {
@@ -256,7 +253,6 @@ public class FindLengthFive extends JFrame implements ActionListener {
                     }
                 }
             }
-            System.out.println("Close file");
             sc.close();
         } catch (FileNotFoundException f) {
             throw new RuntimeException(f);

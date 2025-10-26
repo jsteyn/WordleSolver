@@ -1,6 +1,7 @@
 a_words.txt
 afrikaans_a.txt
 vyfletters.txt
+exclude/
 
 target/
 !.mvn/wrapper/maven-wrapper.jar
