@@ -760,6 +760,7 @@ oorlas
 oorloe
 oorlog
 oornag
+oorsee
 oorsig
 oorval
 oorwin
@@ -1167,4 +1168,3 @@ wysies
 yskoud
 yskoue
 yslike
-oorsee
