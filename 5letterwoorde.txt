@@ -95,6 +95,7 @@ adder
 adres
 aflei
 afmat
+afrem
 agter
 aguur
 aitsa
@@ -854,4 +855,4 @@ yskas
 yster
 zeboe
 êrens
-afrem
+zeboe
