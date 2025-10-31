@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -14,51 +13,50 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class FindLengthFive extends JFrame implements ActionListener {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private static JPanel leftPanel = new JPanel();
-    private static JPanel rightPanel = new JPanel();
-    private static JPanel topPanel = new JPanel();
-    private static JPanel bottomPanel = new JPanel();
+    private static final JPanel leftPanel = new JPanel();
+    private static final JPanel rightPanel = new JPanel();
+    private static final JPanel topPanel = new JPanel();
+    private static final JPanel bottomPanel = new JPanel();
     private static int wordlength = 5;
 
     private static final JLabel lbl_wordLength = new JLabel("Word length");
     private static final JLabel lbl_excludes = new JLabel("Not included");
     private static final JLabel lbl_positions = new JLabel("Known positions");
-    private static final JLabel lbl_knownexcludes = new JLabel("Known exclude positions");
-    private static final JTextField tf_wordlength = new JTextField("5");
+    private static final JLabel lbl_knownExcludes = new JLabel("Known exclude positions");
     private static final JTextField tf_excludes = new JTextField();
     private static JTextField[] tf_positions;
-    private static JTextField[] tf_knownexcludes;
+    private static JTextField[] tf_knownExcludes;
     private static final JButton btn_search = new JButton("Search");
     private static final JButton btn_clear = new JButton("Clear");
     private static final JTextArea ta_words = new JTextArea();
-    private static final JTextField tf_newwords = new JTextField();
+    private static final JTextField tf_newWords = new JTextField();
     private static final JButton btn_add = new JButton("Add");
     private static File wordFile = new File("5letterwords.txt");
-    private static final JButton btn_update = new JButton("Update");
+    private static final JComboBox<Integer> cb_wordLength = new JComboBox<Integer>(new Integer[]{5, 6});
 
-    public static void makeLeftPanel(int wordlength) {
+    public static void makeLeftPanel(int wordLength) {
         leftPanel.setLayout(new MigLayout("", "", ""));
         leftPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         leftPanel.add(lbl_wordLength, "");
-        leftPanel.add(tf_wordlength, "");
-        leftPanel.add(btn_update, "wrap");
+        leftPanel.add(cb_wordLength);
         leftPanel.add(lbl_excludes, "");
         leftPanel.add(tf_excludes, "grow, wrap");
         leftPanel.add(lbl_positions, "cell 0 3,alignx trailing");
-        tf_positions = new JTextField[wordlength];
-        tf_knownexcludes = new JTextField[wordlength];
-        for (int i = 0; i < wordlength; i++) {
+        tf_positions = new JTextField[wordLength];
+        tf_knownExcludes = new JTextField[wordLength];
+        for (int i = 0; i < wordLength; i++) {
             tf_positions[i] = new JTextField(' ');
             leftPanel.add(tf_positions[i], "cell " + (i + 1) + " 3,growx");
         }
-        leftPanel.add(lbl_knownexcludes, "cell 0 4,alignx trailing");
-        for (int i = 0; i < wordlength; i++) {
-            tf_knownexcludes[i] = new JTextField(' ');
-            leftPanel.add(tf_knownexcludes[i], "cell " + (i + 1) + " 4,growx");
+        leftPanel.add(lbl_knownExcludes, "cell 0 4,alignx trailing");
+        for (int i = 0; i < wordLength; i++) {
+            tf_knownExcludes[i] = new JTextField(' ');
+            leftPanel.add(tf_knownExcludes[i], "cell " + (i + 1) + " 4,growx");
         }
         leftPanel.add(new JLabel(), "wrap");
         leftPanel.add(btn_search);
@@ -94,7 +92,7 @@ public class FindLengthFive extends JFrame implements ActionListener {
         btn_search.addActionListener(this);
         btn_clear.addActionListener(this);
         btn_add.addActionListener(this);
-        btn_update.addActionListener(this);
+        cb_wordLength.addActionListener(this);
 
 // ✅ Put the JTextArea inside a JScrollPane
         JScrollPane scroll = new JScrollPane(ta_words);
@@ -103,7 +101,7 @@ public class FindLengthFive extends JFrame implements ActionListener {
 
 
 
-        rightPanel.add(tf_newwords, "wrap");
+        rightPanel.add(tf_newWords, "wrap");
         rightPanel.add(btn_add, "wrap");
 
         topPanel.add(leftPanel, "cell 0 0,grow");
@@ -168,13 +166,13 @@ public class FindLengthFive extends JFrame implements ActionListener {
         }
     };
     private void doAdd() {
-        if (!tf_newwords.getText().isEmpty()) {
+        if (!tf_newWords.getText().isEmpty()) {
             try {
 
                 PrintWriter pw = new PrintWriter(new FileOutputStream(
                         wordFile,
                         true /* append = true */));
-                pw.println(tf_newwords.getText());
+                pw.println(tf_newWords.getText());
                 pw.close();
                 SortContentsByLinesInFile.sortFile(wordFile.getName(), wordlength);
 
@@ -189,7 +187,7 @@ public class FindLengthFive extends JFrame implements ActionListener {
         tf_excludes.setText("");
         for (int i = 0; i < wordlength; i++) {
             tf_positions[i].setText("");
-            tf_knownexcludes[i].setText("");
+            tf_knownExcludes[i].setText("");
         }
     }
 
@@ -205,14 +203,14 @@ public class FindLengthFive extends JFrame implements ActionListener {
         }
         ta_words.setText("");
         //wordFile = new File(tf_wordfile.getText());
-        wordlength = Integer.valueOf(tf_wordlength.getText());
+        wordlength = (int)cb_wordLength.getSelectedItem();
         excludes = tf_excludes.getText();
         for (int i = 0; i < tf_positions.length; i++) {
             if (!tf_positions[i].getText().isEmpty()) {
                 letters[i] = tf_positions[i].getText().trim().charAt(0);
             }
-            if (!tf_knownexcludes[i].getText().isEmpty()) {
-                posexludes[i] = tf_knownexcludes[i].getText();
+            if (!tf_knownExcludes[i].getText().isEmpty()) {
+                posexludes[i] = tf_knownExcludes[i].getText();
                 if (!includes.toString().contains(posexludes[i])) {
                     includes.append(posexludes[i]);
                 }
@@ -275,8 +273,8 @@ public class FindLengthFive extends JFrame implements ActionListener {
                 doAdd();
                 break;
             }
-            case "Update": {
-                wordlength = Integer.parseInt(tf_wordlength.getText());
+            case "comboBoxChanged": {
+                wordlength = (int) cb_wordLength.getSelectedItem();
                 logger.info("Word length: " + wordlength);
                 leftPanel.removeAll();
                 makeLeftPanel(wordlength);
