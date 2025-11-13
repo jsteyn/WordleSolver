@@ -9,10 +9,7 @@ import javax.swing.border.BevelBorder;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -36,6 +33,7 @@ public class FindLengthFive extends JFrame implements ActionListener {
     private static final JTextArea ta_words = new JTextArea();
     private static final JTextField tf_newWords = new JTextField();
     private static final JButton btn_add = new JButton("Add");
+    private static final JButton btn_find = new JButton("Find");
     private static File wordFile = new File("5letterwords.txt");
     private static final JComboBox<Integer> cb_wordLength = new JComboBox<Integer>(new Integer[]{5, 6});
 
@@ -64,7 +62,7 @@ public class FindLengthFive extends JFrame implements ActionListener {
     }
 
     public FindLengthFive() {
-        setTitle("Wordle Solver");
+        setTitle("Wordle Solver: " + "File: " + wordFile + "\t Length: " + wordlength);
         KeyStroke ctrlD = KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_DOWN_MASK);
         KeyStroke ctrlS = KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK);
         KeyStroke ctrlB = KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK);
@@ -92,6 +90,7 @@ public class FindLengthFive extends JFrame implements ActionListener {
         btn_search.addActionListener(this);
         btn_clear.addActionListener(this);
         btn_add.addActionListener(this);
+        btn_find.addActionListener(this);
         cb_wordLength.addActionListener(this);
 
 // ✅ Put the JTextArea inside a JScrollPane
@@ -103,6 +102,7 @@ public class FindLengthFive extends JFrame implements ActionListener {
 
         rightPanel.add(tf_newWords, "wrap");
         rightPanel.add(btn_add, "wrap");
+        rightPanel.add(btn_find, "wrap");
 
         topPanel.add(leftPanel, "cell 0 0,grow");
         topPanel.add(rightPanel, "cell 1 0,grow");
@@ -173,6 +173,7 @@ public class FindLengthFive extends JFrame implements ActionListener {
                         wordFile,
                         true /* append = true */));
                 pw.println(tf_newWords.getText());
+                logger.info("Read file {}", wordFile);
                 pw.close();
                 SortContentsByLinesInFile.sortFile(wordFile.getName(), wordlength);
 
@@ -188,6 +189,60 @@ public class FindLengthFive extends JFrame implements ActionListener {
         for (int i = 0; i < wordlength; i++) {
             tf_positions[i].setText("");
             tf_knownExcludes[i].setText("");
+        }
+    }
+
+    /**
+     * Checks if 'word' contains all the letters in 'letters'.
+     * Comparison is case-insensitive, and letter frequency matters.
+     *
+     * Examples:
+     *   containsAllLetters("apple", "pal") → true
+     *   containsAllLetters("apple", "ppp") → false
+     *   containsAllLetters("banana", "nab") → true
+     */
+    public static boolean containsAllLetters(String word, String letters) {
+        if (word == null || letters == null) return false;
+
+        // Normalize to lowercase
+        word = word.toLowerCase();
+        letters = letters.toLowerCase();
+
+        // Count the frequency of each letter in the word
+        int[] wordCount = new int[26];
+        for (char c : word.toCharArray()) {
+            if (Character.isLetter(c)) {
+                wordCount[c - 'a']++;
+            }
+        }
+
+        // Check if the word has enough of each required letter
+        for (char c : letters.toCharArray()) {
+            if (Character.isLetter(c)) {
+                int index = c - 'a';
+                wordCount[index]--;
+                if (wordCount[index] < 0) {
+                    return false; // not enough of this letter
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private void doFind() {
+        String letters = tf_newWords.getText();
+        try {
+            Scanner sc = new Scanner(wordFile);
+            logger.info("Open {}", wordFile);
+            ta_words.setText("");
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                if (containsAllLetters(line, letters))
+                    ta_words.append(line + "\n");
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -288,7 +343,11 @@ public class FindLengthFive extends JFrame implements ActionListener {
                 int result = fc.showOpenDialog(null);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     wordFile = fc.getSelectedFile();
+                    setTitle("Wordle Solver: " + wordFile);
                 }
+            }
+            case "Find": {
+                doFind();
             }
         }
 
