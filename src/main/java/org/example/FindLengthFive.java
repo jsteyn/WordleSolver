@@ -212,6 +212,7 @@ public class FindLengthFive extends JFrame implements ActionListener {
         int[] wordCount = new int[26];
         for (char c : word.toCharArray()) {
             if (Character.isLetter(c)) {
+                System.out.println(word);
                 wordCount[c - 'a']++;
             }
         }

@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class Harvest {
 
-    static String inputFilename = "I:\\\\BOOKS\\ASCII\\Afrikaans\\Dinsdagaand_trimmed.txt";
+    static String inputFilename = "I:\\\\BOOKS\\ASCII\\Afrikaans\\David_se_reis_na_Groenland_trimmed.txt";
     static String outputFilename = "";
     static int wordLength = 5;
 
@@ -40,7 +40,7 @@ public class Harvest {
                 String[] tokens = line.split(" ");
                 for (String token : tokens) {
                     token = trimPunctuation(token);
-                    if (token.length() == wordLength) {
+                    if (token != null && token.length() == wordLength) {
                         System.out.println( token);
                     }
                 }
