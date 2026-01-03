@@ -10,8 +10,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.*;
-import java.util.Objects;
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.io.IOException;
+import java.nio.file.*;
 
 public class FindLengthFive extends JFrame implements ActionListener {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -34,10 +36,12 @@ public class FindLengthFive extends JFrame implements ActionListener {
     private static final JTextField tf_newWords = new JTextField();
     private static final JButton btn_add = new JButton("Add");
     private static final JButton btn_find = new JButton("Find");
-    private static File wordFile = new File("5letterwords.txt");
-    private static final JComboBox<Integer> cb_wordLength = new JComboBox<Integer>(new Integer[]{5, 6});
+    private static File wordFile = new File("en_5.wrdl");
+//    private static final JComboBox<Integer> cb_wordLength = new JComboBox<Integer>(new Integer[]{5, 6});
+    private static JComboBox<String> cb_wordLength = new JComboBox<>(findWrdlFiles().toArray(new String[0]));;
 
     public static void makeLeftPanel(int wordLength) {
+
         leftPanel.setLayout(new MigLayout("", "", ""));
         leftPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         leftPanel.add(lbl_wordLength, "");
@@ -60,6 +64,24 @@ public class FindLengthFive extends JFrame implements ActionListener {
         leftPanel.add(btn_search);
         leftPanel.add(btn_clear, "wrap");
     }
+
+
+    public static ArrayList<String> findWrdlFiles() {
+        ArrayList<String> filenames = new ArrayList<>();
+
+        Path dir = Paths.get("."); // change this to another directory if needed
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.wrdl")) {
+            for (Path entry : stream) {
+                filenames.add(entry.toString().substring(2));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return filenames;
+    }
+
 
     public FindLengthFive() {
         setTitle("Wordle Solver: " + "File: " + wordFile + "\t Length: " + wordlength);
@@ -259,7 +281,8 @@ public class FindLengthFive extends JFrame implements ActionListener {
         }
         ta_words.setText("");
         //wordFile = new File(tf_wordfile.getText());
-        wordlength = (int)cb_wordLength.getSelectedItem();
+        String filename = (String)cb_wordLength.getSelectedItem();
+        wordlength = Integer.parseInt(filename.substring(3, filename.indexOf(".")));
         excludes = tf_excludes.getText();
         for (int i = 0; i < tf_positions.length; i++) {
             if (!tf_positions[i].getText().isEmpty()) {
@@ -330,23 +353,30 @@ public class FindLengthFive extends JFrame implements ActionListener {
                 break;
             }
             case "comboBoxChanged": {
-                wordlength = (int) cb_wordLength.getSelectedItem();
+                int index = cb_wordLength.getSelectedIndex();
+                String filename = (String) cb_wordLength.getSelectedItem();
+                cb_wordLength.setSelectedIndex(index);
+                wordlength = Integer.parseInt((filename).substring(3, filename.indexOf(".")));
                 logger.info("Word length: " + wordlength);
                 leftPanel.removeAll();
                 makeLeftPanel(wordlength);
                 SwingUtilities.updateComponentTreeUI(leftPanel);
+                wordFile = new File(filename);
+                setTitle("Wordle Solver: " + "File: " + wordFile + "\t Length: " + wordlength);
+                doSearch();
+                break;
             }
-            case "Open": {
-                JFileChooser fc = new JFileChooser();
-                fc.setCurrentDirectory(new File("."));
-                FileNameExtensionFilter extFilter = new FileNameExtensionFilter("Text file", "txt", "TXT");
-                fc.addChoosableFileFilter(extFilter);
-                int result = fc.showOpenDialog(null);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    wordFile = fc.getSelectedFile();
-                    setTitle("Wordle Solver: " + wordFile);
-                }
-            }
+//            case "Open": {
+//                JFileChooser fc = new JFileChooser();
+//                fc.setCurrentDirectory(new File("."));
+//                FileNameExtensionFilter extFilter = new FileNameExtensionFilter("Text file", "txt", "TXT");
+//                fc.addChoosableFileFilter(extFilter);
+//                int result = fc.showOpenDialog(null);
+//                if (result == JFileChooser.APPROVE_OPTION) {
+//                    wordFile = fc.getSelectedFile();
+//                    setTitle("Wordle Solver: " + wordFile);
+//                }
+//            }
             case "Find": {
                 doFind();
             }
